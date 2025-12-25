@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, HTTPException
 import uvicorn 
 from db_manager import get_db
 from data_interactor import get_all_contacts, create_contact, update_contact,get_contact, delete_contact
@@ -34,11 +34,11 @@ def add_contacts(contact: ContactCreate, db: MySQLConnection = Depends(get_db)):
 
 
 @app.put('/contacts/{id}')
-def update_contact_by_id(id:int, budy: dict, db: MySQLConnection = Depends(get_db)):
+def update_contact_by_id(id:int, body: dict, db: MySQLConnection = Depends(get_db)):
     contact = get_contact(db, id).model_dump()
-    for k in budy: 
+    for k in body: 
         if k in contact:
-            contact[k] = budy[k]
+            contact[k] = body[k]
     contact[id] = id
     u_contact = Contact_Read.model_validate(contact)
     is_update = update_contact(db, u_contact)
